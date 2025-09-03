@@ -1,27 +1,22 @@
 package Vistas;
 
+import Controlador.Clases.Contacto;
+import Controlador.Clases.Directorio;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.List;
 
 public class MiInterfazGrafica extends JFrame {
 
     // Paneles globales
     private JPanel genAgregar, panelBuscar, panelListar, panelBienvenida;
     private JTable tablaContactos;
-    private String[][] contactos = {
-            {"Juan", "Pérez", "3001234567"},
-            {"Juan", "Gómez", "3012345678"},
-            {"Pedro", "López", "3023456789"},
-            {"Ana", "Martínez", "3034567890"},
-            {"Luis", "Sánchez", "3045678901"},
-            {"Carla", "Díaz", "3056789012"},
-            {"José", "Ramírez", "3067890123"},
-            {"Lucía", "Fernández", "3078901234"},
-            {"Miguel", "Castro", "3089012345"},
-            {"Sofía", "Moreno", "3090123456"}
-    };
+
+    // Nuevo: Objeto Directorio
+    private Directorio directorio = new Directorio(50); // Ahora soporta hasta 50 contactos
 
     public MiInterfazGrafica() {
         // Configuración ventana
@@ -78,7 +73,10 @@ public class MiInterfazGrafica extends JFrame {
         genContenido.add(panelListar);
 
         // Evento del comboBox
-        comboBox.addActionListener(e -> mostrarPanel((String) comboBox.getSelectedItem()));
+        comboBox.addActionListener(e -> {
+            mostrarPanel((String) comboBox.getSelectedItem());
+            actualizarTablaContactos();
+        });
 
         // Agregar componentes a la app
         app.add(header);
@@ -156,15 +154,23 @@ public class MiInterfazGrafica extends JFrame {
         genAgregar.add(lblMensaje);
 
         btnAgregar.addActionListener(e -> {
-            if (txtNombre.getText().trim().isEmpty() || txtApellido.getText().trim().isEmpty() || txtTelefono.getText().trim().isEmpty()) {
-                lblMensaje.setText("⚠ Por favor, completa todos los campos.");
-                lblMensaje.setForeground(Color.RED);
-            } else {
+            try {
+                String nombre = txtNombre.getText().trim();
+                String apellido = txtApellido.getText().trim();
+                String telefono = txtTelefono.getText().trim();
+
+                Contacto nuevo = new Contacto(nombre, apellido, telefono);
+                directorio.agregarContacto(nuevo);
+
                 lblMensaje.setText("Contacto agregado exitosamente.");
                 lblMensaje.setForeground(new Color(0, 128, 0));
                 txtNombre.setText("");
                 txtApellido.setText("");
                 txtTelefono.setText("");
+                actualizarTablaContactos();
+            } catch (Exception ex) {
+                lblMensaje.setText("⚠ " + ex.getMessage());
+                lblMensaje.setForeground(Color.RED);
             }
         });
     }
@@ -200,78 +206,37 @@ public class MiInterfazGrafica extends JFrame {
         txtApellido.setBounds(90, 70, 200, 25);
         panelBuscar.add(txtApellido);
 
-        JLabel lblTelefono = new JLabel("Teléfono:");
-        lblTelefono.setBounds(10, 100, 80, 20);
-        panelBuscar.add(lblTelefono);
-
-        JTextField txtTelefono = new JTextField();
-        txtTelefono.setBounds(90, 100, 200, 25);
-        panelBuscar.add(txtTelefono);
+        JLabel lblResultado = new JLabel("");
+        lblResultado.setBounds(10, 100, 300, 20);
+        lblResultado.setFont(new Font("Arial", Font.BOLD, 12));
+        panelBuscar.add(lblResultado);
 
         JButton btnBuscar = new JButton("Buscar");
         btnBuscar.setBounds(100, 130, 120, 30);
         panelBuscar.add(btnBuscar);
 
-        JLabel lblResultado = new JLabel("");
-        lblResultado.setBounds(10, 160, 300, 20);
-        lblResultado.setFont(new Font("Arial", Font.BOLD, 12));
-        panelBuscar.add(lblResultado);
-
-        // Botones para modificar y eliminar
-        JButton btnModificar = new JButton("Modificar");
-        btnModificar.setBounds(10, 190, 90, 25);
-        btnModificar.setVisible(false);
-        panelBuscar.add(btnModificar);
-
-        JButton btnEliminar = new JButton("Eliminar");
-        btnEliminar.setBounds(110, 190, 90, 25);
-        btnEliminar.setVisible(false);
-        panelBuscar.add(btnEliminar);
-
-        JButton btnLimpiar = new JButton("Limpiar");
-        btnLimpiar.setBounds(210, 190, 90, 25);
-        btnLimpiar.setVisible(false);
-        panelBuscar.add(btnLimpiar);
-
-        // Evento buscar
         btnBuscar.addActionListener(e -> {
             String nombre = txtNombre.getText().trim();
             String apellido = txtApellido.getText().trim();
-            String telefono = txtTelefono.getText().trim();
-            boolean encontrado = false;
 
-            for (String[] contacto : contactos) {
-                if ((!nombre.isEmpty() && contacto[0].equalsIgnoreCase(nombre)) ||
-                        (!apellido.isEmpty() && contacto[1].equalsIgnoreCase(apellido)) ||
-                        (!telefono.isEmpty() && contacto[2].equals(telefono))) {
-                    lblResultado.setText("Encontrado: " + contacto[0] + " " + contacto[1] + " - " + contacto[2]);
-                    lblResultado.setForeground(Color.GREEN);
-                    btnModificar.setVisible(true);
-                    btnEliminar.setVisible(true);
-                    btnLimpiar.setVisible(true);
-                    encontrado = true;
+            List<Contacto> lista = directorio.getContactos();
+            Contacto encontrado = null;
+
+            for (Contacto c : lista) {
+                if (c.getNombre().equalsIgnoreCase(nombre) &&
+                        c.getApellido().equalsIgnoreCase(apellido)) {
+                    encontrado = c;
                     break;
                 }
             }
 
-            if (!encontrado) {
+            if (encontrado != null) {
+                lblResultado.setText("Encontrado: " + encontrado.obtenerInformacion());
+                lblResultado.setForeground(Color.GREEN);
+            } else {
                 lblResultado.setText("⚠ Contacto no encontrado");
                 lblResultado.setForeground(Color.RED);
-                btnModificar.setVisible(false);
-                btnEliminar.setVisible(false);
-                btnLimpiar.setVisible(true);
             }
-        });
-
-        // Evento limpiar
-        btnLimpiar.addActionListener(e -> {
-            txtNombre.setText("");
-            txtApellido.setText("");
-            txtTelefono.setText("");
-            lblResultado.setText("");
-            btnModificar.setVisible(false);
-            btnEliminar.setVisible(false);
-            btnLimpiar.setVisible(false);
         });
     }
 
@@ -286,15 +251,24 @@ public class MiInterfazGrafica extends JFrame {
 
         String[] columnas = {"ID", "Nombre", "Apellido", "Teléfono"};
         DefaultTableModel modelo = new DefaultTableModel(columnas, 0);
-
-        for (int i = 0; i < contactos.length; i++) {
-            Object[] fila = {i + 1, contactos[i][0], contactos[i][1], contactos[i][2]};
-            modelo.addRow(fila);
-        }
-
         tablaContactos = new JTable(modelo);
+
         JScrollPane scroll = new JScrollPane(tablaContactos);
         panelListar.add(scroll, BorderLayout.CENTER);
+    }
+
+    // ==============================
+    // ACTUALIZAR TABLA
+    // ==============================
+    private void actualizarTablaContactos() {
+        DefaultTableModel modelo = (DefaultTableModel) tablaContactos.getModel();
+        modelo.setRowCount(0);
+
+        List<Contacto> lista = directorio.getContactos();
+        for (int i = 0; i < lista.size(); i++) {
+            Contacto c = lista.get(i);
+            modelo.addRow(new Object[]{i + 1, c.getNombre(), c.getApellido(), c.getTelefono()});
+        }
     }
 
     // ==============================
@@ -318,6 +292,7 @@ public class MiInterfazGrafica extends JFrame {
                 break;
             case "Listar Contactos":
                 panelListar.setVisible(true);
+                actualizarTablaContactos();
                 break;
         }
     }
