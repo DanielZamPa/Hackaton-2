@@ -8,14 +8,14 @@ import java.awt.event.ActionListener;
 public class MiInterfazGrafica extends JFrame {
 
     // Paneles globales
-    private JPanel genAgregar;
-    private JPanel genConfirmar;
-    private JPanel genListar;
-    private JLabel lblMensajeBuscar;
+    private final JPanel genAgregar;
+    private final JPanel genConfirmar;
+    private final JPanel genListar;
+    private final JLabel lblMensajeBuscar;
 
     public MiInterfazGrafica() {
         // Configuración básica de la ventana
-        setTitle("Mi Primera Interfaz Gráfica");
+        setTitle("Agenda de contactos");
         setSize(400, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(null);
