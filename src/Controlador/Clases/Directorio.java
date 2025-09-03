@@ -23,11 +23,7 @@ public class Directorio implements Directorios {
 
     @Override
     public void agregarContacto(Contacto contacto) {
-        if (contacto == null || contacto.getNombre().isEmpty() || contacto.getApellido().isEmpty()) {
-            System.out.println("Nombre y apellido no pueden estar vacíos.");
-            return;
-        }
-
+        // La validación de nombre/apellido ya la hace el constructor de Contacto, no es necesaria aquí.
         if (agendaLlena()) {
             System.out.println("La agenda está llena.");
             return;
@@ -42,6 +38,24 @@ public class Directorio implements Directorios {
         System.out.println("Contacto agregado correctamente.");
 
 
+    }
+
+    private boolean agendaLlena() {
+        return contactos.size() >= maxSize;
+    }
+
+    private boolean existeContacto(Contacto contacto) {
+        for (Contacto c : contactos) {
+            if (contacto.equals(c)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Método para que otras clases puedan ver la lista de contactos
+    public List<Contacto> getContactos() {
+        return this.contactos;
     }
 
     @Override

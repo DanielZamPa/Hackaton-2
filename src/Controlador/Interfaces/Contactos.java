@@ -13,10 +13,10 @@ public interface Contactos {
     int MIN_LONGITUD_TELEFONO = 7;   // Mínimo 7 dígitos (ej: 1234567)
     int MAX_LONGITUD_TELEFONO = 15;  // Máximo 15 dígitos (números internacionales)
 
-    // Configuración para la agenda (para tus compañeros)
+    // Configuración para la agenda
     int TAMAÑO_AGENDA_DEFAULT = 10;  // Si no especifican tamaño, serán 10 contactos
 
-    // 📝 MENSAJES DE ERROR ESTÁNDAR (para que todo el equipo use los mismos)
+    // 📝 MENSAJES DE ERROR ESTÁNDAR
     // Esto hace que el programa se vea más profesional y consistente
     String ERROR_NOMBRE_VACIO = "❌ Error: El nombre no puede estar vacío";
     String ERROR_APELLIDO_VACIO = "❌ Error: El apellido no puede estar vacío";
@@ -42,13 +42,6 @@ public interface Contactos {
     boolean esTelefonoValido(String telefono);
 
     /**
-     * 👥 Compara si este contacto es igual a otro
-     * @param otroContacto el contacto con el que comparar
-     * @return true si son iguales (mismo nombre y apellido), false si no
-     */
-    boolean sonIguales(Object otroContacto);
-
-    /**
      * 📄 Devuelve la información del contacto en formato texto
      * @return String con la información del contacto
      */
@@ -61,16 +54,6 @@ public interface Contactos {
     boolean esValido();
 }
 
-// 📚 EXPLICACIÓN PARA EL EQUIPO:
-//
-// Esta interfaz es como el "manual de instrucciones" del proyecto.
-//
-// 🎯 BENEFICIOS:
-// 1. Todo el equipo usa los mismos mensajes de error
-// 2. Si quieren cambiar la longitud del teléfono, solo cambian AQUÍ
-// 3. Hace el código más profesional y organizado
-// 4. Los jueces del hackathon van a ver que saben trabajar en equipo
-//
 // 🤝 CÓMO USARLA:
 // - En clase Contacto: implements Contactos
 // - Para usar constantes: Contactos.MIN_LONGITUD_TELEFONO

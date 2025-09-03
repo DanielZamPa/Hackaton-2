@@ -3,29 +3,31 @@
 
 // 📦 IMPORTS
 import Controlador.Clases.Contacto;
-import Controlador.Interfaces.Contactos;
+import Controlador.Clases.Directorio;
+import java.util.List;
 import java.util.Scanner;   // Para leer desde la consola
-import java.util.ArrayList; // Para guardar múltiples contactos
 
 public class Main {
-
-    // 🎨 Colores para hacer la consola más bonita (opcional)
-    public static final String RESET = "\u001B[0m";
-    public static final String RED = "\u001B[31m";
-    public static final String GREEN = "\u001B[32m";
-    public static final String BLUE = "\u001B[34m";
-    public static final String YELLOW = "\u001B[33m";
-
     // 📋 Lista para guardar los contactos que creemos
-    private static ArrayList<Contacto> contactos = new ArrayList<>();
+    private static Directorio directorio = new Directorio(); // Usamos el constructor por defecto (10 contactos)
     private static Scanner scanner = new Scanner(System.in);
 
+    // 📋 MOSTRAR MENÚ PRINCIPAL
+    private static void mostrarMenu() {
+        System.out.println("\n" + "=== MENÚ PRINCIPAL ===");
+        System.out.println("1️⃣  Crear contacto nuevo");
+        System.out.println("2️⃣  Listar contactos creados");
+        System.out.println("3️⃣  Comparar dos contactos");
+        System.out.println("4️⃣  Modificar teléfono");
+        System.out.println("0️⃣  Salir");
+        System.out.print("👉 Selecciona una opción: ");
+    }
     public static void main(String[] args) {
 
-        System.out.println(BLUE + "=".repeat(50));
+        System.out.println("=".repeat(50));
         System.out.println("🎯 PROBADOR DE VALIDACIONES - CONTACTOS");
         System.out.println("📚 Hackathon Java - Equipo Increíble");
-        System.out.println("=".repeat(50) + RESET);
+        System.out.println("=".repeat(50));
 
         boolean continuar = true;
 
@@ -46,36 +48,21 @@ public class Main {
                 case 4:
                     modificarTelefono();
                     break;
-                case 5:
-                    probarValidaciones();
-                    break;
                 case 0:
                     continuar = false;
-                    System.out.println(GREEN + "🎉 ¡Gracias por probar el sistema!" + RESET);
+                    System.out.println("🎉 ¡Gracias por probar el sistema!");
                     break;
                 default:
-                    System.out.println(RED + "❌ Opción inválida. Intenta de nuevo." + RESET);
+                    System.out.println("❌ Opción inválida. Intenta de nuevo.");
             }
 
             if (continuar) {
-                System.out.println("\n" + YELLOW + "Presiona ENTER para continuar..." + RESET);
+                System.out.println("\n" + "Presiona ENTER para continuar...");
                 scanner.nextLine();
             }
         }
 
         scanner.close();
-    }
-
-    // 📋 MOSTRAR MENÚ PRINCIPAL
-    private static void mostrarMenu() {
-        System.out.println("\n" + BLUE + "=== MENÚ PRINCIPAL ===" + RESET);
-        System.out.println("1️⃣  Crear contacto nuevo");
-        System.out.println("2️⃣  Listar contactos creados");
-        System.out.println("3️⃣  Comparar dos contactos");
-        System.out.println("4️⃣  Modificar teléfono");
-        System.out.println("5️⃣  Probar validaciones (casos extremos)");
-        System.out.println("0️⃣  Salir");
-        System.out.print(YELLOW + "👉 Selecciona una opción: " + RESET);
     }
 
     // 🔢 LEER OPCIÓN DEL USUARIO
@@ -92,7 +79,7 @@ public class Main {
 
     // 1️⃣ CREAR CONTACTO INTERACTIVO
     private static void crearContactoInteractivo() {
-        System.out.println("\n" + BLUE + "=== CREAR CONTACTO NUEVO ===" + RESET);
+        System.out.println("\n" + "=== CREAR CONTACTO NUEVO ===");
 
         System.out.print("📝 Ingresa el nombre: ");
         String nombre = scanner.nextLine();
@@ -105,38 +92,38 @@ public class Main {
 
         try {
             Contacto nuevoContacto = new Contacto(nombre, apellido, telefono);
-            contactos.add(nuevoContacto);
-
-            System.out.println(GREEN + "✅ ¡Contacto creado exitosamente!" + RESET);
-            System.out.println("👤 " + nuevoContacto.obtenerInformacion());
-            System.out.println("✅ ¿Es válido? " + nuevoContacto.esValido());
-
+            // Usamos el método de nuestro objeto Directorio
+            directorio.agregarContacto(nuevoContacto);
+            // El método agregarContacto ya imprime su propio mensaje de éxito/error.
         } catch (Exception e) {
-            System.out.println(RED + e.getMessage() + RESET);
-            System.out.println(YELLOW + "💡 Tip: Revisa que el nombre y apellido no estén vacíos, y el teléfono tenga entre 7-15 números." + RESET);
+            System.out.println(e.getMessage());
+            System.out.println("💡 Tip: Revisa que el nombre y apellido no estén vacíos, y el teléfono tenga entre 7-15 números.");
         }
     }
 
     // 2️⃣ LISTAR CONTACTOS
     private static void listarContactos() {
-        System.out.println("\n" + BLUE + "=== CONTACTOS CREADOS ===" + RESET);
+        System.out.println("\n" + "=== CONTACTOS CREADOS ===");
+        List<Contacto> lista = directorio.getContactos(); // Obtenemos la lista desde el directorio
 
-        if (contactos.isEmpty()) {
-            System.out.println(YELLOW + "📭 No hay contactos creados aún." + RESET);
+        if (lista.isEmpty()) {
+            System.out.println("📭 No hay contactos creados aún.");
             return;
         }
 
-        for (int i = 0; i < contactos.size(); i++) {
-            System.out.println((i + 1) + ". " + contactos.get(i).obtenerInformacion());
+        for (int i = 0; i < lista.size(); i++) {
+            System.out.println((i + 1) + ". " + lista.get(i).obtenerInformacion());
         }
     }
 
     // 3️⃣ COMPARAR CONTACTOS
     private static void compararContactos() {
-        System.out.println("\n" + BLUE + "=== COMPARAR CONTACTOS ===" + RESET);
+        System.out.println("\n" + "=== COMPARAR CONTACTOS ===");
 
-        if (contactos.size() < 2) {
-            System.out.println(YELLOW + "📭 Necesitas al menos 2 contactos para comparar." + RESET);
+        List<Contacto> lista = directorio.getContactos();
+
+        if (lista.size() < 2) {
+            System.out.println("📭 Necesitas al menos 2 contactos para comparar.");
             return;
         }
 
@@ -148,34 +135,35 @@ public class Main {
         System.out.print("👉 Selecciona el segundo contacto (número): ");
         int indice2 = leerOpcion() - 1;
 
-        if (indice1 >= 0 && indice1 < contactos.size() &&
-                indice2 >= 0 && indice2 < contactos.size()) {
+        if (indice1 >= 0 && indice1 < lista.size() &&
+                indice2 >= 0 && indice2 < lista.size()) {
 
-            Contacto c1 = contactos.get(indice1);
-            Contacto c2 = contactos.get(indice2);
+            Contacto c1 = lista.get(indice1);
+            Contacto c2 = lista.get(indice2);
 
             System.out.println("👥 Contacto 1: " + c1.obtenerInformacion());
             System.out.println("👥 Contacto 2: " + c2.obtenerInformacion());
 
-            boolean sonIguales = c1.sonIguales(c2);
-
-            if (sonIguales) {
-                System.out.println(GREEN + "✅ Son IGUALES (mismo nombre y apellido)" + RESET);
+            // Usamos el método .equals() que definimos en la clase Contacto
+            if (c1.equals(c2)) {
+                System.out.println("✅ Son IGUALES (mismo nombre y apellido)");
             } else {
-                System.out.println(RED + "❌ Son DIFERENTES" + RESET);
+                System.out.println("❌ Son DIFERENTES");
             }
 
         } else {
-            System.out.println(RED + "❌ Índices inválidos." + RESET);
+            System.out.println("❌ Índices inválidos.");
         }
     }
 
     // 4️⃣ MODIFICAR TELÉFONO
     private static void modificarTelefono() {
-        System.out.println("\n" + BLUE + "=== MODIFICAR TELÉFONO ===" + RESET);
+        System.out.println("\n" + "=== MODIFICAR TELÉFONO ===");
 
-        if (contactos.isEmpty()) {
-            System.out.println(YELLOW + "📭 No hay contactos para modificar." + RESET);
+        List<Contacto> lista = directorio.getContactos();
+
+        if (lista.isEmpty()) {
+            System.out.println("📭 No hay contactos para modificar.");
             return;
         }
 
@@ -184,8 +172,8 @@ public class Main {
         System.out.print("👉 Selecciona el contacto a modificar (número): ");
         int indice = leerOpcion() - 1;
 
-        if (indice >= 0 && indice < contactos.size()) {
-            Contacto contacto = contactos.get(indice);
+        if (indice >= 0 && indice < lista.size()) {
+            Contacto contacto = lista.get(indice);
 
             System.out.println("📞 Teléfono actual: " + contacto.getTelefono());
             System.out.print("📞 Nuevo teléfono (7-15 dígitos): ");
@@ -193,45 +181,14 @@ public class Main {
 
             try {
                 contacto.setTelefono(nuevoTelefono);
-                System.out.println(GREEN + "✅ ¡Teléfono modificado exitosamente!" + RESET);
+                System.out.println("✅ ¡Teléfono modificado exitosamente!");
                 System.out.println("👤 " + contacto.obtenerInformacion());
             } catch (Exception e) {
-                System.out.println(RED + e.getMessage() + RESET);
+                System.out.println(e.getMessage());
             }
 
         } else {
-            System.out.println(RED + "❌ Índice inválido." + RESET);
+            System.out.println("❌ Índice inválido.");
         }
     }
-
-    // 5️⃣ PROBAR VALIDACIONES (CASOS EXTREMOS)
-    private static void probarValidaciones() {
-        System.out.println("\n" + BLUE + "=== PRUEBAS AUTOMÁTICAS DE VALIDACIONES ===" + RESET);
-
-        // Lista de casos de prueba
-        String[][] casos = {
-                {"Juan", "Pérez", "1234567890", "✅ VÁLIDO"},
-                {"", "González", "9876543210", "❌ Nombre vacío"},
-                {"María", "", "5555555555", "❌ Apellido vacío"},
-                {"Pedro", "López", "123", "❌ Teléfono muy corto"},
-                {"Ana", "Martín", "12345678901234567890", "❌ Teléfono muy largo"},
-                {"Luis", "Ruiz", "123abc456", "❌ Teléfono con letras"},
-                {"   ", "García", "7777777777", "❌ Nombre solo espacios"},
-                {"Carlos", "   ", "8888888888", "❌ Apellido solo espacios"},
-                {"Sofia", "Herrera", "", "❌ Teléfono vacío"},
-                {"MARIA", "lopez", "1111111111", "✅ VÁLIDO (mayúsculas)"}
-        };
-
-        for (int i = 0; i < casos.length; i++) {
-            System.out.println("\n🧪 Caso " + (i + 1) + ": " + casos[i][3]);
-            System.out.println("📋 Datos: '" + casos[i][0] + "', '" + casos[i][1] + "', '" + casos[i][2] + "'");
-
-            try {
-                Contacto contacto = new Contacto(casos[i][0], casos[i][1], casos[i][2]);
-                System.out.println(GREEN + "✅ Contacto creado: " + contacto.obtenerInformacion() + RESET);
-            } catch (Exception e) {
-                System.out.println(RED + "❌ " + e.getMessage() + RESET);
-            }
-        }
-    }
-}
+}//Cierre de clase main

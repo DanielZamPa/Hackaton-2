@@ -1,19 +1,15 @@
-// 📁 Archivo: Classes/Contacto.java
-// 🎯 Esta clase representa UN contacto individual
-
 package Controlador.Clases;
 
 import Controlador.Interfaces.Contactos;
 
-// 🤝 "implements Contactos" = esta clase PROMETE cumplir el contrato de la interfaz
 public class Contacto implements Contactos {
 
-    // 🏠 ATRIBUTOS PRIVADOS (las "cajitas" donde guardamos la información)
+    // 🏠 ATRIBUTOS PRIVADOS
     private String nombre;
     private String apellido;
     private String telefono;
 
-    // 🏗️ CONSTRUCTOR (el "fabricante" de contactos)
+    // 🏗️ CONSTRUCTOR
     public Contacto(String nombre, String apellido, String telefono) {
 
         // ✅ VALIDACIÓN 1: Nombre no puede estar vacío
@@ -38,7 +34,7 @@ public class Contacto implements Contactos {
         this.telefono = telefono.trim();
     }
 
-    // 📞 IMPLEMENTACIÓN del método de la interfaz (OBLIGATORIO)
+    // 📞 IMPLEMENTACIÓN del método de la interfaz
     @Override
     public boolean esTelefonoValido(String telefono) {
 
@@ -57,13 +53,6 @@ public class Contacto implements Contactos {
         // 📝 EXPLICACIÓN DEL PATRÓN:
         // Si MIN=7 y MAX=15, se convierte en: "^\\d{7,15}$"
         // ^ = inicio, \\d = dígito, {7,15} = entre 7 y 15, $ = final
-    }
-
-    // 👥 IMPLEMENTACIÓN del método de la interfaz (OBLIGATORIO)
-    @Override
-    public boolean sonIguales(Object otroContacto) {
-        // Reutilizamos nuestro método equals() que ya teníamos
-        return this.equals(otroContacto);
     }
 
     // 📄 IMPLEMENTACIÓN del método de la interfaz (OBLIGATORIO)
@@ -103,28 +92,28 @@ public class Contacto implements Contactos {
         this.telefono = nuevoTelefono.trim();
     }
 
-    // ⚖️ MÉTODO EQUALS (para comparar contactos)
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-
-        Contacto otroContacto = (Contacto) obj;
-
-        // Comparar nombre y apellido sin importar mayúsculas/minúsculas
-        return this.nombre.equalsIgnoreCase(otroContacto.nombre) &&
-                this.apellido.equalsIgnoreCase(otroContacto.apellido);
-    }
-
-    // 🏷️ MÉTODO HASHCODE (necesario con equals)
-    @Override
-    public int hashCode() {
-        return (nombre.toLowerCase() + apellido.toLowerCase()).hashCode();
-    }
-
     // 📄 MÉTODO TOSTRING (para mostrar el contacto bonito)
     @Override
     public String toString() {
         return nombre + " " + apellido + " - " + telefono;
+    }
+
+    // ⚖️ MÉTODO EQUALS (para comparar si dos contactos son "iguales")
+    // Dos contactos son iguales si tienen el mismo nombre y apellido (ignorando mayúsculas).
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Contacto contacto = (Contacto) o;
+        return nombre.equalsIgnoreCase(contacto.nombre) &&
+               apellido.equalsIgnoreCase(contacto.apellido);
+    }
+
+    // #️⃣ MÉTODO HASHCODE (requerido si se sobrescribe equals)
+    // Genera un código numérico basado en el nombre y apellido.
+    @Override
+    public int hashCode() {
+        // Usamos una clase de ayuda para generar un hash a partir de varios campos.
+        return java.util.Objects.hash(nombre.toLowerCase(), apellido.toLowerCase());
     }
 }
