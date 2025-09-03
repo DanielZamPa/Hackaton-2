@@ -1,6 +1,7 @@
 package Vistas;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -8,25 +9,36 @@ import java.awt.event.ActionListener;
 public class MiInterfazGrafica extends JFrame {
 
     // Paneles globales
-    private JPanel genAgregar;
-    private JPanel genConfirmar;
-    private JPanel genListar;
-    private JLabel lblMensajeBuscar;
+    private JPanel genAgregar, panelConfirmar, panelListar;
+    private JTable tablaContactos;
+
+    // Datos de ejemplo para la tabla
+    private String[][] contactos = {
+            {"Juan", "Pérez", "3001234567"},
+            {"María", "Gómez", "3012345678"},
+            {"Pedro", "López", "3023456789"},
+            {"Ana", "Martínez", "3034567890"},
+            {"Luis", "Sánchez", "3045678901"},
+            {"Carla", "Díaz", "3056789012"},
+            {"José", "Ramírez", "3067890123"},
+            {"Lucía", "Fernández", "3078901234"},
+            {"Miguel", "Castro", "3089012345"},
+            {"Sofía", "Moreno", "3090123456"}
+    };
 
     public MiInterfazGrafica() {
-        // Configuración básica de la ventana
+        // Configuración de ventana
         setTitle("Mi Primera Interfaz Gráfica");
         setSize(400, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(null);
 
-        // Contenedor principal
         JPanel app = new JPanel();
         app.setBounds(0, 0, 400, 400);
         app.setBackground(new Color(51, 51, 51));
         app.setLayout(null);
 
-        // Panel superior (header)
+        // Header
         JPanel header = new JPanel();
         header.setBounds(20, 10, 320, 50);
         header.setOpaque(false);
@@ -44,174 +56,156 @@ public class MiInterfazGrafica extends JFrame {
         subtitulo.setFont(new Font("Arial", Font.BOLD, 12));
         header.add(subtitulo);
 
-        // Contenedor central donde estarán los paneles
+        // Panel contenedor
         JPanel genContenido = new JPanel();
         genContenido.setBounds(20, 70, 340, 250);
         genContenido.setBackground(new Color(255, 255, 255));
         genContenido.setLayout(null);
 
-        // Crear lista desplegable
-        String[] opciones = {
-                "¿Qué deseas hacer?",
-                "Agregar Contacto",
-                "Confirmar Contacto",
-                "Listar Contactos",
-                "Buscar Contactos"
-        };
-
+        // Lista desplegable
+        String[] opciones = {"¿Qué deseas hacer?", "Agregar Contacto", "Confirmar Contacto", "Listar Contactos", "Buscar Contactos"};
         JComboBox<String> comboBox = new JComboBox<>(opciones);
         comboBox.setBounds(10, 10, 320, 30);
         genContenido.add(comboBox);
 
-        // Crear los paneles usando métodos
-        genAgregar = crearPanelAgregar();
-        genConfirmar = crearPanelConfirmar();
-        genListar = crearPanelListar();
+        // Crear paneles
+        crearPanelAgregar();
+        crearPanelConfirmar();
+        crearPanelListar();
 
-        // Mensaje simple para la opción "Buscar Contactos"
-        lblMensajeBuscar = new JLabel("Aquí podrás buscar contactos...");
-        lblMensajeBuscar.setBounds(20, 70, 300, 30);
-        lblMensajeBuscar.setForeground(Color.BLUE);
-        lblMensajeBuscar.setVisible(false);
-        genContenido.add(lblMensajeBuscar);
-
-        // Agregar los paneles al contenedor
+        // Agregar paneles al contenedor
         genContenido.add(genAgregar);
-        genContenido.add(genConfirmar);
-        genContenido.add(genListar);
+        genContenido.add(panelConfirmar);
+        genContenido.add(panelListar);
 
-        // Control de visibilidad con el ComboBox
+        // Evento del comboBox
         comboBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String seleccion = (String) comboBox.getSelectedItem();
-                mostrarPanel(seleccion);
+                mostrarPanel((String) comboBox.getSelectedItem());
             }
         });
 
-        // Agregar todo a la ventana
+        // Agregar a la ventana
         app.add(header);
         app.add(genContenido);
         add(app);
     }
 
-    // ============================
-    // MÉTODO: Panel para Agregar Contactos
-    // ============================
-    private JPanel crearPanelAgregar() {
-        JPanel panel = new JPanel();
-        panel.setBounds(10, 50, 320, 200);
-        panel.setLayout(null);
-        panel.setBackground(new Color(240, 248, 255));
-        panel.setVisible(false);
+    // ==============================
+    // PANEL 1 - AGREGAR CONTACTO
+    // ==============================
+    private void crearPanelAgregar() {
+        genAgregar = new JPanel();
+        genAgregar.setBounds(10, 50, 320, 200);
+        genAgregar.setLayout(null);
+        genAgregar.setBackground(new Color(240, 248, 255));
+        genAgregar.setVisible(false);
 
         JLabel lblTitulo = new JLabel("Añadir Contacto");
         lblTitulo.setBounds(10, 10, 200, 20);
         lblTitulo.setFont(new Font("Arial", Font.BOLD, 14));
-        panel.add(lblTitulo);
+        genAgregar.add(lblTitulo);
 
         JLabel lblNombre = new JLabel("Nombre:");
         lblNombre.setBounds(10, 40, 80, 20);
-        panel.add(lblNombre);
+        genAgregar.add(lblNombre);
 
         JTextField txtNombre = new JTextField();
         txtNombre.setBounds(100, 40, 180, 25);
-        panel.add(txtNombre);
+        genAgregar.add(txtNombre);
 
         JLabel lblApellido = new JLabel("Apellido:");
         lblApellido.setBounds(10, 75, 80, 20);
-        panel.add(lblApellido);
+        genAgregar.add(lblApellido);
 
         JTextField txtApellido = new JTextField();
         txtApellido.setBounds(100, 75, 180, 25);
-        panel.add(txtApellido);
+        genAgregar.add(txtApellido);
 
         JLabel lblTelefono = new JLabel("Teléfono:");
         lblTelefono.setBounds(10, 110, 80, 20);
-        panel.add(lblTelefono);
+        genAgregar.add(lblTelefono);
 
         JTextField txtTelefono = new JTextField();
         txtTelefono.setBounds(100, 110, 180, 25);
-        panel.add(txtTelefono);
+        genAgregar.add(txtTelefono);
 
         JButton btnAgregar = new JButton("Agregar");
         btnAgregar.setBounds(100, 150, 100, 30);
-        panel.add(btnAgregar);
+        genAgregar.add(btnAgregar);
 
         JLabel lblMensaje = new JLabel("");
         lblMensaje.setBounds(10, 180, 300, 20);
         lblMensaje.setForeground(Color.GREEN);
-        panel.add(lblMensaje);
+        genAgregar.add(lblMensaje);
 
         btnAgregar.addActionListener(e -> {
-            if (txtNombre.getText().trim().isEmpty()
-                    || txtApellido.getText().trim().isEmpty()
-                    || txtTelefono.getText().trim().isEmpty()) {
+            if (txtNombre.getText().trim().isEmpty() || txtApellido.getText().trim().isEmpty() || txtTelefono.getText().trim().isEmpty()) {
                 lblMensaje.setText("⚠ Por favor, completa todos los campos.");
                 lblMensaje.setForeground(Color.RED);
             } else {
-                lblMensaje.setText("✅ Contacto agregado exitosamente.");
+                lblMensaje.setText("Contacto agregado exitosamente.");
                 lblMensaje.setForeground(new Color(0, 128, 0));
                 txtNombre.setText("");
                 txtApellido.setText("");
                 txtTelefono.setText("");
             }
         });
-
-        return panel;
     }
 
-    // ============================
-    // MÉTODO: Panel para Confirmar Contactos
-    // ============================
-    private JPanel crearPanelConfirmar() {
-        JPanel panel = new JPanel();
-        panel.setBounds(10, 50, 320, 200);
-        panel.setBackground(new Color(220, 255, 220));
-        panel.setLayout(new BorderLayout());
-        panel.add(new JLabel("Aquí confirmarías los contactos.", SwingConstants.CENTER), BorderLayout.CENTER);
-        panel.setVisible(false);
-        return panel;
+    // ==============================
+    // PANEL 2 - CONFIRMAR CONTACTO
+    // ==============================
+    private void crearPanelConfirmar() {
+        panelConfirmar = new JPanel();
+        panelConfirmar.setBounds(10, 50, 320, 200);
+        panelConfirmar.setBackground(Color.GREEN);
+        panelConfirmar.add(new JLabel("Aquí podrías confirmar un contacto"));
+        panelConfirmar.setVisible(false);
     }
 
-    // ============================
-    // MÉTODO: Panel para Listar Contactos
-    // ============================
-    private JPanel crearPanelListar() {
-        JPanel panel = new JPanel();
-        panel.setBounds(10, 50, 320, 200);
-        panel.setBackground(new Color(220, 220, 255));
-        panel.setLayout(new BorderLayout());
-        panel.add(new JLabel("Aquí se listarían los contactos.", SwingConstants.CENTER), BorderLayout.CENTER);
-        panel.setVisible(false);
-        return panel;
+    // ==============================
+    // PANEL 3 - LISTAR CONTACTOS
+    // ==============================
+    private void crearPanelListar() {
+        panelListar = new JPanel();
+        panelListar.setBounds(10, 50, 320, 200);
+        panelListar.setLayout(new BorderLayout());
+        panelListar.setVisible(false);
+
+        // Modelo de tabla
+        String[] columnas = {"ID", "Nombre", "Apellido", "Teléfono"};
+        DefaultTableModel modelo = new DefaultTableModel(columnas, 0);
+
+        // Cargar datos desde el array
+        for (int i = 0; i < contactos.length; i++) {
+            Object[] fila = {i + 1, contactos[i][0], contactos[i][1], contactos[i][2]};
+            modelo.addRow(fila);
+        }
+
+        tablaContactos = new JTable(modelo);
+        JScrollPane scroll = new JScrollPane(tablaContactos);
+        panelListar.add(scroll, BorderLayout.CENTER);
     }
 
-    // ============================
-    // MÉTODO: Mostrar panel correcto
-    // ============================
+    // ==============================
+    // MOSTRAR PANEL SEGÚN SELECCIÓN
+    // ==============================
     private void mostrarPanel(String seleccion) {
-        // Ocultar todos
         genAgregar.setVisible(false);
-        genConfirmar.setVisible(false);
-        genListar.setVisible(false);
-        lblMensajeBuscar.setVisible(false);
+        panelConfirmar.setVisible(false);
+        panelListar.setVisible(false);
 
-        // Mostrar solo el que corresponde
         switch (seleccion) {
             case "Agregar Contacto":
                 genAgregar.setVisible(true);
                 break;
             case "Confirmar Contacto":
-                genConfirmar.setVisible(true);
+                panelConfirmar.setVisible(true);
                 break;
             case "Listar Contactos":
-                genListar.setVisible(true);
-                break;
-            case "Buscar Contactos":
-                lblMensajeBuscar.setVisible(true);
-                break;
-            default:
+                panelListar.setVisible(true);
                 break;
         }
     }

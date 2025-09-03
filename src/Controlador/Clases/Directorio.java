@@ -39,4 +39,6 @@ public class Directorio implements Directorios {
 
         contactos.add(contacto);
         System.out.println("Contacto agregado correctamente.");
+
+
     }
