@@ -1,34 +1,26 @@
 package Vistas;
 
+import Controlador.Clases.Contacto;
+import Controlador.Clases.Directorio;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
+import java.util.List;
 
 public class MiInterfazGrafica extends JFrame {
 
     // Paneles globales
-    private JPanel genAgregar, panelConfirmar, panelListar;
+    private JPanel genAgregar, panelBuscar, panelListar, panelBienvenida;
     private JTable tablaContactos;
 
-    // Datos de ejemplo para la tabla
-    private String[][] contactos = {
-            {"Juan", "Pérez", "3001234567"},
-            {"María", "Gómez", "3012345678"},
-            {"Pedro", "López", "3023456789"},
-            {"Ana", "Martínez", "3034567890"},
-            {"Luis", "Sánchez", "3045678901"},
-            {"Carla", "Díaz", "3056789012"},
-            {"José", "Ramírez", "3067890123"},
-            {"Lucía", "Fernández", "3078901234"},
-            {"Miguel", "Castro", "3089012345"},
-            {"Sofía", "Moreno", "3090123456"}
-    };
+    // Nuevo: Objeto Directorio
+    private Directorio directorio = new Directorio(50); // Ahora soporta hasta 50 contactos
 
     public MiInterfazGrafica() {
-        // Configuración de ventana
-        setTitle("Mi Primera Interfaz Gráfica");
+        // Configuración ventana
+        setTitle("Contactos: Papitas Inc");
         setSize(400, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(null);
@@ -53,43 +45,64 @@ public class MiInterfazGrafica extends JFrame {
         JLabel subtitulo = new JLabel("Creado por Papitas Inc");
         subtitulo.setBounds(5, 30, 400, 12);
         subtitulo.setForeground(Color.GRAY);
-        subtitulo.setFont(new Font("Arial", Font.BOLD, 12));
+        subtitulo.setFont(new Font("Arial", Font.BOLD, 10));
         header.add(subtitulo);
 
-        // Panel contenedor
+        // Panel contenedor principal
         JPanel genContenido = new JPanel();
-        genContenido.setBounds(20, 70, 340, 250);
+        genContenido.setBounds(20, 70, 340, 275);
         genContenido.setBackground(new Color(255, 255, 255));
         genContenido.setLayout(null);
 
         // Lista desplegable
-        String[] opciones = {"¿Qué deseas hacer?", "Agregar Contacto", "Confirmar Contacto", "Listar Contactos", "Buscar Contactos"};
+        String[] opciones = {"¿Qué deseas hacer?", "Agregar Contacto", "Buscar Contactos", "Listar Contactos"};
         JComboBox<String> comboBox = new JComboBox<>(opciones);
         comboBox.setBounds(10, 10, 320, 30);
         genContenido.add(comboBox);
 
         // Crear paneles
+        crearPanelBienvenida();
         crearPanelAgregar();
-        crearPanelConfirmar();
+        crearPanelBuscar();
         crearPanelListar();
 
         // Agregar paneles al contenedor
+        genContenido.add(panelBienvenida);
         genContenido.add(genAgregar);
-        genContenido.add(panelConfirmar);
+        genContenido.add(panelBuscar);
         genContenido.add(panelListar);
 
         // Evento del comboBox
-        comboBox.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                mostrarPanel((String) comboBox.getSelectedItem());
-            }
+        comboBox.addActionListener(e -> {
+            mostrarPanel((String) comboBox.getSelectedItem());
+            actualizarTablaContactos();
         });
 
-        // Agregar a la ventana
+        // Agregar componentes a la app
         app.add(header);
         app.add(genContenido);
         add(app);
+    }
+
+    // ==============================
+    // PANEL BIENVENIDA
+    // ==============================
+    private void crearPanelBienvenida() {
+        panelBienvenida = new JPanel();
+        panelBienvenida.setBounds(10, 50, 320, 200);
+        panelBienvenida.setLayout(null);
+        panelBienvenida.setBackground(new Color(240, 248, 255));
+        panelBienvenida.setVisible(true);
+
+        JLabel lblTitulo = new JLabel("Bienvenido a la App de Contactos");
+        lblTitulo.setBounds(10, 10, 300, 20);
+        lblTitulo.setFont(new Font("Arial", Font.BOLD, 14));
+        panelBienvenida.add(lblTitulo);
+
+        JLabel lblDev = new JLabel("<html>Desarrolladores:<br>• Daniel Zamora<br>• Sergio Gonzalez<br>• Andres Vanegas<br>• David Paez</html>");
+        lblDev.setBounds(10, 40, 300, 100);
+        lblDev.setFont(new Font("Arial", Font.PLAIN, 12));
+        panelBienvenida.add(lblDev);
     }
 
     // ==============================
@@ -141,29 +154,167 @@ public class MiInterfazGrafica extends JFrame {
         genAgregar.add(lblMensaje);
 
         btnAgregar.addActionListener(e -> {
-            if (txtNombre.getText().trim().isEmpty() || txtApellido.getText().trim().isEmpty() || txtTelefono.getText().trim().isEmpty()) {
-                lblMensaje.setText("⚠ Por favor, completa todos los campos.");
-                lblMensaje.setForeground(Color.RED);
-            } else {
+            try {
+                String nombre = txtNombre.getText().trim();
+                String apellido = txtApellido.getText().trim();
+                String telefono = txtTelefono.getText().trim();
+
+                Contacto nuevo = new Contacto(nombre, apellido, telefono);
+                directorio.agregarContacto(nuevo);
+
                 lblMensaje.setText("Contacto agregado exitosamente.");
                 lblMensaje.setForeground(new Color(0, 128, 0));
                 txtNombre.setText("");
                 txtApellido.setText("");
                 txtTelefono.setText("");
+                actualizarTablaContactos();
+            } catch (Exception ex) {
+                lblMensaje.setText("⚠ " + ex.getMessage());
+                lblMensaje.setForeground(Color.RED);
             }
         });
     }
 
     // ==============================
-    // PANEL 2 - CONFIRMAR CONTACTO
-    // ==============================
-    private void crearPanelConfirmar() {
-        panelConfirmar = new JPanel();
-        panelConfirmar.setBounds(10, 50, 320, 200);
-        panelConfirmar.setBackground(Color.GREEN);
-        panelConfirmar.add(new JLabel("Aquí podrías confirmar un contacto"));
-        panelConfirmar.setVisible(false);
+// PANEL 2 - BUSCAR CONTACTOS
+// ==============================
+    private void crearPanelBuscar() {
+        panelBuscar = new JPanel();
+        panelBuscar.setBounds(10, 50, 320, 250);
+        panelBuscar.setLayout(null);
+        panelBuscar.setBackground(new Color(240, 248, 255));
+        panelBuscar.setVisible(false);
+
+        JLabel lblTitulo = new JLabel("Buscar Contacto");
+        lblTitulo.setBounds(10, 10, 200, 20);
+        lblTitulo.setFont(new Font("Arial", Font.BOLD, 14));
+        panelBuscar.add(lblTitulo);
+
+        JLabel lblNombre = new JLabel("Nombre:");
+        lblNombre.setBounds(10, 40, 80, 20);
+        panelBuscar.add(lblNombre);
+
+        JTextField txtNombre = new JTextField();
+        txtNombre.setBounds(90, 40, 200, 25);
+        panelBuscar.add(txtNombre);
+
+        JLabel lblApellido = new JLabel("Apellido:");
+        lblApellido.setBounds(10, 70, 80, 20);
+        panelBuscar.add(lblApellido);
+
+        JTextField txtApellido = new JTextField();
+        txtApellido.setBounds(90, 70, 200, 25);
+        panelBuscar.add(txtApellido);
+
+        JLabel lblTelefono = new JLabel("Teléfono:");
+        lblTelefono.setBounds(10, 100, 80, 20);
+        panelBuscar.add(lblTelefono);
+
+        JTextField txtTelefono = new JTextField();
+        txtTelefono.setBounds(90, 100, 200, 25);
+        txtTelefono.setEditable(false); // Bloqueado por defecto
+        panelBuscar.add(txtTelefono);
+
+        JLabel lblResultado = new JLabel("");
+        lblResultado.setBounds(10, 130, 300, 20);
+        lblResultado.setFont(new Font("Arial", Font.BOLD, 12));
+        panelBuscar.add(lblResultado);
+
+        JButton btnBuscar = new JButton("Buscar");
+        btnBuscar.setBounds(10, 160, 90, 30);
+        panelBuscar.add(btnBuscar);
+
+        JButton btnModificar = new JButton("Modificar");
+        btnModificar.setBounds(110, 160, 90, 30);
+        btnModificar.setEnabled(false);
+        panelBuscar.add(btnModificar);
+
+        JButton btnEliminar = new JButton("Eliminar");
+        btnEliminar.setBounds(210, 160, 90, 30);
+        btnEliminar.setEnabled(false);
+        panelBuscar.add(btnEliminar);
+
+        final Contacto[] contactoEncontrado = {null};
+
+        // BOTÓN BUSCAR
+        btnBuscar.addActionListener(e -> {
+            String nombre = txtNombre.getText().trim();
+            String apellido = txtApellido.getText().trim();
+
+            List<Contacto> lista = directorio.getContactos();
+            contactoEncontrado[0] = null;
+
+            for (Contacto c : lista) {
+                if (c.getNombre().equalsIgnoreCase(nombre) && c.getApellido().equalsIgnoreCase(apellido)) {
+                    contactoEncontrado[0] = c;
+                    break;
+                }
+            }
+
+            if (contactoEncontrado[0] != null) {
+                lblResultado.setText("✅ Contacto encontrado");
+                lblResultado.setForeground(Color.GREEN);
+                txtTelefono.setText(contactoEncontrado[0].getTelefono());
+                txtTelefono.setEditable(true);
+                btnModificar.setEnabled(true);
+                btnEliminar.setEnabled(true);
+            } else {
+                lblResultado.setText("⚠ Contacto no encontrado");
+                lblResultado.setForeground(Color.RED);
+                txtTelefono.setText("");
+                txtTelefono.setEditable(false);
+                btnModificar.setEnabled(false);
+                btnEliminar.setEnabled(false);
+            }
+        });
+
+        // BOTÓN MODIFICAR
+        btnModificar.addActionListener(e -> {
+            if (contactoEncontrado[0] != null) {
+                try {
+                    String nuevoTelefono = txtTelefono.getText().trim();
+                    if (nuevoTelefono.isEmpty()) {
+                        JOptionPane.showMessageDialog(this, "El teléfono no puede estar vacío.", "Error", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                    contactoEncontrado[0].setTelefono(nuevoTelefono);
+
+                    lblResultado.setText("✅ Contacto modificado");
+                    lblResultado.setForeground(Color.BLUE);
+                    actualizarTablaContactos();
+                } catch (Exception ex) {
+                    lblResultado.setText("⚠ Error al modificar");
+                    lblResultado.setForeground(Color.RED);
+                }
+            }
+        });
+
+        // BOTÓN ELIMINAR
+        btnEliminar.addActionListener(e -> {
+            if (contactoEncontrado[0] != null) {
+                int confirmacion = JOptionPane.showConfirmDialog(
+                        this,
+                        "¿Estás seguro de eliminar este contacto?",
+                        "Confirmar eliminación",
+                        JOptionPane.YES_NO_OPTION
+                );
+
+                if (confirmacion == JOptionPane.YES_OPTION) {
+                    directorio.eliminarContacto(contactoEncontrado[0].getNombre(), contactoEncontrado[0].getApellido());
+                    lblResultado.setText("✅ Contacto eliminado");
+                    lblResultado.setForeground(Color.RED);
+                    txtNombre.setText("");
+                    txtApellido.setText("");
+                    txtTelefono.setText("");
+                    txtTelefono.setEditable(false);
+                    btnModificar.setEnabled(false);
+                    btnEliminar.setEnabled(false);
+                    actualizarTablaContactos();
+                }
+            }
+        });
     }
+
 
     // ==============================
     // PANEL 3 - LISTAR CONTACTOS
@@ -174,38 +325,50 @@ public class MiInterfazGrafica extends JFrame {
         panelListar.setLayout(new BorderLayout());
         panelListar.setVisible(false);
 
-        // Modelo de tabla
         String[] columnas = {"ID", "Nombre", "Apellido", "Teléfono"};
         DefaultTableModel modelo = new DefaultTableModel(columnas, 0);
-
-        // Cargar datos desde el array
-        for (int i = 0; i < contactos.length; i++) {
-            Object[] fila = {i + 1, contactos[i][0], contactos[i][1], contactos[i][2]};
-            modelo.addRow(fila);
-        }
-
         tablaContactos = new JTable(modelo);
+
         JScrollPane scroll = new JScrollPane(tablaContactos);
         panelListar.add(scroll, BorderLayout.CENTER);
     }
 
     // ==============================
-    // MOSTRAR PANEL SEGÚN SELECCIÓN
+    // ACTUALIZAR TABLA
+    // ==============================
+    private void actualizarTablaContactos() {
+        DefaultTableModel modelo = (DefaultTableModel) tablaContactos.getModel();
+        modelo.setRowCount(0);
+
+        List<Contacto> lista = directorio.getContactos();
+        for (int i = 0; i < lista.size(); i++) {
+            Contacto c = lista.get(i);
+            modelo.addRow(new Object[]{i + 1, c.getNombre(), c.getApellido(), c.getTelefono()});
+        }
+    }
+
+    // ==============================
+    // MOSTRAR PANEL
     // ==============================
     private void mostrarPanel(String seleccion) {
+        panelBienvenida.setVisible(false);
         genAgregar.setVisible(false);
-        panelConfirmar.setVisible(false);
+        panelBuscar.setVisible(false);
         panelListar.setVisible(false);
 
         switch (seleccion) {
+            case "¿Qué deseas hacer?":
+                panelBienvenida.setVisible(true);
+                break;
             case "Agregar Contacto":
                 genAgregar.setVisible(true);
                 break;
-            case "Confirmar Contacto":
-                panelConfirmar.setVisible(true);
+            case "Buscar Contactos":
+                panelBuscar.setVisible(true);
                 break;
             case "Listar Contactos":
                 panelListar.setVisible(true);
+                actualizarTablaContactos();
                 break;
         }
     }

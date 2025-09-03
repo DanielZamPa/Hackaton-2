@@ -23,11 +23,7 @@ public class Directorio implements Directorios {
 
     @Override
     public void agregarContacto(Contacto contacto) {
-        if (contacto == null || contacto.getNombre().isEmpty() || contacto.getApellido().isEmpty()) {
-            System.out.println("Nombre y apellido no pueden estar vacíos.");
-            return;
-        }
-
+        // La validación de nombre/apellido ya la hace el constructor de Contacto, no es necesaria aquí.
         if (agendaLlena()) {
             System.out.println("La agenda está llena.");
             return;
@@ -44,18 +40,54 @@ public class Directorio implements Directorios {
 
     }
 
+    private boolean agendaLlena() {
+        return contactos.size() >= maxSize;
+    }
+
+    private boolean existeContacto(Contacto contacto) {
+        for (Contacto c : contactos) {
+            if (contacto.equals(c)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Método para que otras clases puedan ver la lista de contactos
+    public List<Contacto> getContactos() {
+        return this.contactos;
+    }
+
     @Override
     public void buscarContacto(String nombre, String apellido) {
     }
 
     @Override
     public boolean editarContacto(String nombre, String apellido, String nuevoTelefono) {
-        return false;
+        for (Contacto c : contactos) {
+            if (c.getNombre().trim().equalsIgnoreCase(nombre.trim()) &&
+                    c.getApellido().trim().equalsIgnoreCase(apellido.trim())) {
+
+                c.setTelefono(nuevoTelefono);
+                return true; // Modificación exitosa
+            }
+        }
+        return false; // No se encontró el contacto
     }
+
 
     @Override
     public boolean eliminarContacto(String nombre, String apellido) {
-        return false;
+        for (int i = 0; i < contactos.size(); i++) {
+            Contacto c = contactos.get(i);
+            if (c.getNombre().trim().equalsIgnoreCase(nombre.trim()) &&
+                    c.getApellido().trim().equalsIgnoreCase(apellido.trim())) {
 
+                contactos.remove(i);
+                return true; // Eliminación exitosa
+            }
+        }
+        return false; // No se encontró el contacto
     }
+
 }
