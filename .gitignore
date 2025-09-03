@@ -4,6 +4,7 @@ out/
 !**/src/main/**/out/
 !**/src/test/**/out/
 Hackaton.iml
+src/Hackaton-2.iml
 
 ### Eclipse ###
 .apt_generated
