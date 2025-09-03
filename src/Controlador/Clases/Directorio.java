@@ -1,5 +1,6 @@
 package Controlador.Clases;
 
+
 import Controlador.Interfaces.Directorios;
 import Controlador.Clases.Contacto;
 import java.util.ArrayList;
@@ -40,3 +41,19 @@ public class Directorio implements Directorios {
         contactos.add(contacto);
         System.out.println("Contacto agregado correctamente.");
     }
+
+    @Override
+    public void buscarContacto(String nombre, String apellido) {
+    }
+
+    @Override
+    public boolean editarContacto(String nombre, String apellido, String nuevoTelefono) {
+        return false;
+    }
+
+    @Override
+    public boolean eliminarContacto(String nombre, String apellido) {
+        return false;
+
+    }
+}
