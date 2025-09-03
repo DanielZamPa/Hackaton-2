@@ -176,8 +176,8 @@ public class MiInterfazGrafica extends JFrame {
     }
 
     // ==============================
-    // PANEL 2 - BUSCAR CONTACTOS
-    // ==============================
+// PANEL 2 - BUSCAR CONTACTOS
+// ==============================
     private void crearPanelBuscar() {
         panelBuscar = new JPanel();
         panelBuscar.setBounds(10, 50, 320, 250);
@@ -206,39 +206,115 @@ public class MiInterfazGrafica extends JFrame {
         txtApellido.setBounds(90, 70, 200, 25);
         panelBuscar.add(txtApellido);
 
+        JLabel lblTelefono = new JLabel("Teléfono:");
+        lblTelefono.setBounds(10, 100, 80, 20);
+        panelBuscar.add(lblTelefono);
+
+        JTextField txtTelefono = new JTextField();
+        txtTelefono.setBounds(90, 100, 200, 25);
+        txtTelefono.setEditable(false); // Bloqueado por defecto
+        panelBuscar.add(txtTelefono);
+
         JLabel lblResultado = new JLabel("");
-        lblResultado.setBounds(10, 100, 300, 20);
+        lblResultado.setBounds(10, 130, 300, 20);
         lblResultado.setFont(new Font("Arial", Font.BOLD, 12));
         panelBuscar.add(lblResultado);
 
         JButton btnBuscar = new JButton("Buscar");
-        btnBuscar.setBounds(100, 130, 120, 30);
+        btnBuscar.setBounds(10, 160, 90, 30);
         panelBuscar.add(btnBuscar);
 
+        JButton btnModificar = new JButton("Modificar");
+        btnModificar.setBounds(110, 160, 90, 30);
+        btnModificar.setEnabled(false);
+        panelBuscar.add(btnModificar);
+
+        JButton btnEliminar = new JButton("Eliminar");
+        btnEliminar.setBounds(210, 160, 90, 30);
+        btnEliminar.setEnabled(false);
+        panelBuscar.add(btnEliminar);
+
+        final Contacto[] contactoEncontrado = {null};
+
+        // BOTÓN BUSCAR
         btnBuscar.addActionListener(e -> {
             String nombre = txtNombre.getText().trim();
             String apellido = txtApellido.getText().trim();
 
             List<Contacto> lista = directorio.getContactos();
-            Contacto encontrado = null;
+            contactoEncontrado[0] = null;
 
             for (Contacto c : lista) {
-                if (c.getNombre().equalsIgnoreCase(nombre) &&
-                        c.getApellido().equalsIgnoreCase(apellido)) {
-                    encontrado = c;
+                if (c.getNombre().equalsIgnoreCase(nombre) && c.getApellido().equalsIgnoreCase(apellido)) {
+                    contactoEncontrado[0] = c;
                     break;
                 }
             }
 
-            if (encontrado != null) {
-                lblResultado.setText("Encontrado: " + encontrado.obtenerInformacion());
+            if (contactoEncontrado[0] != null) {
+                lblResultado.setText("✅ Contacto encontrado");
                 lblResultado.setForeground(Color.GREEN);
+                txtTelefono.setText(contactoEncontrado[0].getTelefono());
+                txtTelefono.setEditable(true);
+                btnModificar.setEnabled(true);
+                btnEliminar.setEnabled(true);
             } else {
                 lblResultado.setText("⚠ Contacto no encontrado");
                 lblResultado.setForeground(Color.RED);
+                txtTelefono.setText("");
+                txtTelefono.setEditable(false);
+                btnModificar.setEnabled(false);
+                btnEliminar.setEnabled(false);
+            }
+        });
+
+        // BOTÓN MODIFICAR
+        btnModificar.addActionListener(e -> {
+            if (contactoEncontrado[0] != null) {
+                try {
+                    String nuevoTelefono = txtTelefono.getText().trim();
+                    if (nuevoTelefono.isEmpty()) {
+                        JOptionPane.showMessageDialog(this, "El teléfono no puede estar vacío.", "Error", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                    contactoEncontrado[0].setTelefono(nuevoTelefono);
+
+                    lblResultado.setText("✅ Contacto modificado");
+                    lblResultado.setForeground(Color.BLUE);
+                    actualizarTablaContactos();
+                } catch (Exception ex) {
+                    lblResultado.setText("⚠ Error al modificar");
+                    lblResultado.setForeground(Color.RED);
+                }
+            }
+        });
+
+        // BOTÓN ELIMINAR
+        btnEliminar.addActionListener(e -> {
+            if (contactoEncontrado[0] != null) {
+                int confirmacion = JOptionPane.showConfirmDialog(
+                        this,
+                        "¿Estás seguro de eliminar este contacto?",
+                        "Confirmar eliminación",
+                        JOptionPane.YES_NO_OPTION
+                );
+
+                if (confirmacion == JOptionPane.YES_OPTION) {
+                    directorio.eliminarContacto(contactoEncontrado[0].getNombre(), contactoEncontrado[0].getApellido());
+                    lblResultado.setText("✅ Contacto eliminado");
+                    lblResultado.setForeground(Color.RED);
+                    txtNombre.setText("");
+                    txtApellido.setText("");
+                    txtTelefono.setText("");
+                    txtTelefono.setEditable(false);
+                    btnModificar.setEnabled(false);
+                    btnEliminar.setEnabled(false);
+                    actualizarTablaContactos();
+                }
             }
         });
     }
+
 
     // ==============================
     // PANEL 3 - LISTAR CONTACTOS

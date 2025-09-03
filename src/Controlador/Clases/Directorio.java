@@ -64,12 +64,30 @@ public class Directorio implements Directorios {
 
     @Override
     public boolean editarContacto(String nombre, String apellido, String nuevoTelefono) {
-        return false;
+        for (Contacto c : contactos) {
+            if (c.getNombre().trim().equalsIgnoreCase(nombre.trim()) &&
+                    c.getApellido().trim().equalsIgnoreCase(apellido.trim())) {
+
+                c.setTelefono(nuevoTelefono);
+                return true; // Modificación exitosa
+            }
+        }
+        return false; // No se encontró el contacto
     }
+
 
     @Override
     public boolean eliminarContacto(String nombre, String apellido) {
-        return false;
+        for (int i = 0; i < contactos.size(); i++) {
+            Contacto c = contactos.get(i);
+            if (c.getNombre().trim().equalsIgnoreCase(nombre.trim()) &&
+                    c.getApellido().trim().equalsIgnoreCase(apellido.trim())) {
 
+                contactos.remove(i);
+                return true; // Eliminación exitosa
+            }
+        }
+        return false; // No se encontró el contacto
     }
+
 }
