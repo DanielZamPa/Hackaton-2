@@ -62,9 +62,9 @@ public interface Contactos {
 }
 
 // 📚 EXPLICACIÓN PARA EL EQUIPO:
-// 
+//
 // Esta interfaz es como el "manual de instrucciones" del proyecto.
-// 
+//
 // 🎯 BENEFICIOS:
 // 1. Todo el equipo usa los mismos mensajes de error
 // 2. Si quieren cambiar la longitud del teléfono, solo cambian AQUÍ
